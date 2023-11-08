@@ -36,7 +36,8 @@ td {
     background-color: lightsalmon;
 }
 
-td > .hide {
+/* td > .hide { */
+.hide {
     display: none;
 }
 

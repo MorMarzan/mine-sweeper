@@ -8,15 +8,17 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
 }
 
-function getCellsWithVal(val) {
-    var cells = []
-    for (let i = 0; i < gBoard.length; i++) {
-        for (let j = 0; j < gBoard[i].length; j++) {
-            if (gBoard[i][j] === val) {
-                cells.push({ i, j })
-            }
+function getNegPositions(rowIdx, colIdx, mat) {
+    const negsPositions = []
+
+    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
+        if (i < 0 || i >= mat.length) continue
+
+        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
+            if (i === rowIdx && j === colIdx) continue
+            if (j < 0 || j >= mat[i].length) continue
+            negsPositions.push({ i , j })
         }
     }
-    if (cells.length === 0) return null
-    return cells
+    return negsPositions
 }
