@@ -25,7 +25,7 @@ function onInit() {
 
     renderBoard(gBoard)
     //intiate vars
-
+    // document.addEventListener('contextmenu', (ev) => ev.preventDefault())
 }
 
 function buildBoard(size, minesNum) {
@@ -51,7 +51,7 @@ function setMines(board, minesNum) {
     //static location for development
     board[0][0].isMine = true
     board[0][1].isMine = true
-    
+
     //random
     /* var possiblePositions = getBoardPositions(board)
 
@@ -70,7 +70,7 @@ function getBoardPositions(board) {
     const positions = []
     for (var i = 0; i < board.length; i++) {
         for (var j = 0; j < board[i].length; j++) {
-            positions.push({i,j})
+            positions.push({ i, j })
         }
     }
     return positions
@@ -113,38 +113,42 @@ function renderBoard(board) {
             const strDataAttr = `data-i="${i}" data-j="${j}"`
 
             strHtml += `
-                \t<td 
-                    onclick="onCellClicked(this, ${i}, ${j})" ${strDataAttr}
+                \t<td oncontextmenu="onCellMarked(event, this)"
+                    onclick="onCellClicked(this, ${i}, ${j})" 
+                    ${strDataAttr}
                     class="${strClass}">
-                        <div class="${divStrClass}">
-                        ${cellContent}</div>
-                    </td>\n`
+                    <div class="${divStrClass}">
+                        ${cellContent}
+                    </div>
+                </td>\n`
         }
         strHtml += `</tr>`
     }
     elBoard.innerHTML = strHtml
 }
+//oncontextmenu="(event) => {onCellMarked(event, this)}"
+//oncontextmenu="onCellMarked(event, this)"
+
 
 function onCellClicked(elCell, i, j) {
     //TO DO: CHECK IF GAME IS ON
 
     const currCell = gBoard[i][j]
 
-    //show cell content:
-    if (currCell.isShown) return
-    // console.log('cell clicked!')
-    currCell.isShown = true
-    elCell.querySelector("div").classList.remove("hide")
+    if (currCell.isShown || currCell.isMarked) return
 
     //check if mine was clicked -> gameOver(),return
     if (currCell.isMine) {
-        gameOver()
+        gameOver(false)
         return
     }
+    //show cell content:
+    currCell.isShown = true
+    elCell.querySelector("div").classList.remove("hide")
 
     //check if cell with no neg mines ("safe cell") -> expandShown
     if (!currCell.minesAroundCount) {
-        expandShown(gBoard, elCell,i, j)
+        expandShown(gBoard, elCell, i, j)
     }
 
     /* Game ends when all mines are
@@ -153,11 +157,38 @@ function onCellClicked(elCell, i, j) {
     //checkGameOver() - check victory
 }
 
-function onCellMarked(elCell) {
-    /* Called when a cell is right-
-clicked
-See how you can hide the context
-menu on right click */
+function onCellMarked(event, elCell) {
+    // Called when a cell is right-clicked 
+    console.log('right Clicked!')
+    event.preventDefault()
+
+    //take coors from elCell, update model, render cell
+    const cellPos = getBoardPos(elCell)
+    const currCell = gBoard[cellPos.i][cellPos.j]
+    if (currCell.isShown) return
+
+    currCell.isMarked = !currCell.isMarked
+
+    if (currCell.isMarked) {
+        elCell.classList.add("marked")
+    } else {
+        elCell.classList.remove("marked")
+    }
+
+}
+
+//extracts model pos from DOM
+function getBoardPos(elCell) {
+    const rowIdx = elCell.dataset.i
+    const colIdx = elCell.dataset.j
+    // console.log('board pos is:', {rowIdx, colIdx})
+    return { i: rowIdx, j: colIdx }
+}
+
+//extracts DOM el from model. loc {i,j}
+function getEl(location) {
+    const selector = `[data-i="${location.i}"][data-j="${location.j}"]`
+    return document.querySelector(selector)
 }
 
 function checkGameOver() {
@@ -173,8 +204,31 @@ function expandShown(board, elCell,
     console.log('EXPAND')
 }
 
-function gameOver() {
-    console.log('GAME OVER!')
+function revealAllMines() {
+    for (let i = 0; i < gBoard.length; i++) {
+        for (let j = 0; j < gBoard[i].length; j++) {
+            var currCell = gBoard[i][j]
+            if (currCell.isMine) {
+                // console.log('its a mine!')
+                gBoard[i][j].isShown = true
+                // console.log(`gBoard[${i}][${j}]`, gBoard[i][j])
+
+                var currEl = getEl({ i, j })
+                // currEl.querySelector("div").classList.remove("hide")
+
+            }
+        }
+    }
+
+}
+
+function gameOver(isVictory = false) {
+    if (isVictory) {
+        console.log('VICTORY!')
+    } else {
+        console.log('GAME OVER!')
+        revealAllMines()
+    }
 }
 
 

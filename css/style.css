@@ -22,14 +22,18 @@ td {
     /* padding: 10px; */
     transition: 0.5s;
     /* text-align: center; */
+    background-color: lightskyblue;
+}
+
+.board td.marked {
+    background-image: url("../img/red-flag.png");
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .board td:hover {
     background-color: lightsalmon;
-}
-
-td.cell {
-    background-color: lightskyblue;
 }
 
 td > .hide {
