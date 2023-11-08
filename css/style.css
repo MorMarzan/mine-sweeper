@@ -1,0 +1,52 @@
+* {
+    box-sizing: border-box;
+}
+
+/* :root {
+    --border-radius: 10px;
+}
+
+div {
+    border-radius: var(--border-radius);
+} */
+
+table,
+td {
+    border: 1px solid black;
+}
+
+.board td {
+    width: 50px;
+    height: 50px;
+
+    /* padding: 10px; */
+    transition: 0.5s;
+    /* text-align: center; */
+}
+
+.board td:hover {
+    background-color: lightsalmon;
+}
+
+td.cell {
+    background-color: lightskyblue;
+}
+
+td > .hide {
+    display: none;
+}
+
+td > div {
+    background-color: white;
+    width: inherit;
+    height: inherit;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* transition: 0.5s; */
+}
+
+footer {
+    position: absolute;
+    bottom: 2em;
+}
