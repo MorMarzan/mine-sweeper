@@ -9,6 +9,9 @@ var gBoard
 var gLevel
 var gGame
 
+var gStartTime
+var gInterval
+
 /********** game initiation funcs **********/
 
 function onInit(size = 4) {
@@ -46,6 +49,9 @@ function restartScreen() {
         elHints[i].classList.remove("used")
     }
 
+    clearInterval(gInterval)
+    document.querySelector('.timer span').innerText = "0.000"
+
     restartBtnChange(NORMAL)
 
 }
@@ -80,7 +86,9 @@ function restartBtnChange(img) {
 
 function updateLives() {
     var elLivesSpan = document.querySelector(".lives span")
-    elLivesSpan.innerText = gLevel.lives 
+
+    elLivesSpan.innerText = gLevel.lives
+    markTextToggle(elLivesSpan)
 }
 
 function updateMinesDisplay() {
@@ -88,6 +96,14 @@ function updateMinesDisplay() {
     var elMinesSpan = document.querySelector(".mines span")
 
     elMinesSpan.innerText = gLevel.mines - gGame.markedCount - minesShown
+    markTextToggle(elMinesSpan)
+}
+
+function markTextToggle(elSpan) {
+    elSpan.classList.add("big")
+    setTimeout(() => {
+        elSpan.classList.remove("big")
+    }, 500, elSpan)
 }
 
 /********** model setting board funcs **********/
@@ -213,6 +229,7 @@ function onCellClicked(elCell, i, j) {
     if (!gGame.firstClick) {
         // console.log('1st click!')
         gGame.firstClick = true
+        startTimer()
 
         //intitiate board with mines DOM and model
         setMines(gBoard, gLevel.mines, { i, j })
@@ -297,7 +314,7 @@ function expandShown(board, i, j, forHint = false, elCell = null, toHide = null)
         } else {
             if (!currNeg.isShown) toggleShowElCell(elNeg, toHide)
         }
-    }  
+    }
 }
 
 //updating show mode in DOM and model 
@@ -332,20 +349,6 @@ function getBoardPos(elCell) {
 
 /********** end of game funcs **********/
 
-//updating mine revealing in DOM and model 
-function revealAllMines() {
-    for (let i = 0; i < gBoard.length; i++) {
-        for (let j = 0; j < gBoard[i].length; j++) {
-            var currCell = gBoard[i][j]
-            if (currCell.isMine) {
-                gBoard[i][j].isShown = true
-                var currEl = getEl({ i, j })
-                currEl.querySelector("div").classList.remove("hide")
-            }
-        }
-    }
-}
-
 //better name is check victory, but this is according to instructions
 function checkGameOver() {
     const cellsNum = gLevel.size ** 2
@@ -353,18 +356,6 @@ function checkGameOver() {
         areMarkedsCorrect()) {
         gameOver(true)
     }
-}
-
-function areMarkedsCorrect() {
-    for (var i = 0; i < gBoard.length; i++) {
-        for (var j = 0; j < gBoard[i].length; j++) {
-            var currCell = gBoard[i][j]
-            if (!currCell.isMine && currCell.isMarked) {
-                return false
-            }
-        }
-    }
-    return true
 }
 
 function gameOver(isVictory = false) {
@@ -382,12 +373,39 @@ function gameOver(isVictory = false) {
     elModal.classList.remove("hide")
 
     gGame.isOn = false
-    
+    stopTimer()
+
     const elHintsDiv = document.querySelector(".hints")
     elHintsDiv.classList.add("disabeled")
 }
 
-/********** bonus funcs - before sorting **********/
+function areMarkedsCorrect() {
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard[i].length; j++) {
+            var currCell = gBoard[i][j]
+            if (!currCell.isMine && currCell.isMarked) {
+                return false
+            }
+        }
+    }
+    return true
+}
+
+//updating mine revealing in DOM and model 
+function revealAllMines() {
+    for (let i = 0; i < gBoard.length; i++) {
+        for (let j = 0; j < gBoard[i].length; j++) {
+            var currCell = gBoard[i][j]
+            if (currCell.isMine) {
+                gBoard[i][j].isShown = true
+                var currEl = getEl({ i, j })
+                currEl.querySelector("div").classList.remove("hide")
+            }
+        }
+    }
+}
+
+/********** extara features - hints funcs **********/
 
 function onHint(elHint) {
     gGame.hintMode = true
@@ -402,4 +420,22 @@ function hintModeOff() {
     gGame.hintMode = false
     const elHintsDiv = document.querySelector(".hints")
     elHintsDiv.classList.remove("disabeled")
+}
+
+/********** timer funcs **********/
+
+function startTimer() {
+    clearInterval(gInterval)
+    gStartTime = new Date().getTime()
+    gInterval = setInterval(updateTimer, 37)
+}
+
+function updateTimer() {
+    const currentTime = new Date().getTime()
+    const elapsedTime = (currentTime - gStartTime) / 1000
+    document.querySelector('.timer span').innerText = elapsedTime.toFixed(3)
+}
+
+function stopTimer() {
+    clearInterval(gInterval)
 }
