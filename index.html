@@ -13,10 +13,20 @@
     <h1>MINE SWEEPER</h1>
 
     <div class="control-panel">
-        <button onclick="onInit(4)">4</button>
-        <button onclick="onInit(8)">8</button>
-        <button onclick="onInit(12)">12</button>
-
+        <div class="level-btns">
+            <button onclick="onInit(4)">4</button>
+            <button onclick="onInit(8)">8</button>
+            <button onclick="onInit(12)">12</button>
+        </div>
+        <div class="lives">
+            <p><span>X</span> LIVES LEFT</p>
+        </div>
+        <div class="restart">
+            <button onclick="onInit()">
+                😃
+                <!-- <img src="../img/red-flag.png"> -->
+            </button>
+        </div>
     </div>
 
     <table>
@@ -25,7 +35,7 @@
 
     <div class="game-over hide">
         <h2>GAME OVER</h2>
-        <button onclick="onInit()">Restart</button>
+        
     </div>
 
     <footer>© MOR MARZAN</footer>

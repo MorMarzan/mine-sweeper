@@ -8,6 +8,16 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
 }
 
+function getMatPositions(mat) {
+    const positions = []
+    for (var i = 0; i < mat.length; i++) {
+        for (var j = 0; j < mat[i].length; j++) {
+            positions.push({ i, j })
+        }
+    }
+    return positions
+}
+
 function getNegPositions(rowIdx, colIdx, mat) {
     const negsPositions = []
 
