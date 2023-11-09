@@ -15,7 +15,7 @@ function onInit(size = 4) {
     gLevel = {
         size,
         mines: getMinesNum(size),
-        lives: getLivessNum(size)
+        lives: getLivesNum(size)
     }
     gGame = {
         isOn: true,
@@ -23,19 +23,29 @@ function onInit(size = 4) {
         shownCount: 0,
         markedCount: 0,
         secsPassed: 0,
-
+        shownMines: 0
     }
+
     gBoard = buildBoard(gLevel.size, gLevel.mines)
     console.log('gBoard', gBoard)
     renderBoard(gBoard)
 
     updateLives()
+    updateMinesDisplay()
     restartScreen()
 }
 
 function restartScreen() {
     const elModal = document.querySelector(".game-over")
     elModal.classList.add("hide")
+
+    const elHintsDiv = document.querySelector(".hints")
+    elHintsDiv.classList.add("disabeled")
+    const elHints = elHintsDiv.querySelectorAll("div")
+    for (var i = 0; i < elHints.length; i++) {
+        elHints[i].classList.remove("used")
+    }
+
     restartBtnChange(NORMAL)
 
 }
@@ -53,7 +63,7 @@ function getMinesNum(size) {
     }
 }
 
-function getLivessNum(size) {
+function getLivesNum(size) {
     switch (size) {
         case 4:
             return 2
@@ -70,7 +80,14 @@ function restartBtnChange(img) {
 
 function updateLives() {
     var elLivesSpan = document.querySelector(".lives span")
-    elLivesSpan.innerText = gLevel.lives
+    elLivesSpan.innerText = gLevel.lives 
+}
+
+function updateMinesDisplay() {
+    const minesShown = getLivesNum(gLevel.size) - gLevel.lives
+    var elMinesSpan = document.querySelector(".mines span")
+
+    elMinesSpan.innerText = gLevel.mines - gGame.markedCount - minesShown
 }
 
 /********** model setting board funcs **********/
@@ -102,7 +119,7 @@ function setMines(board, minesNum, firstClickPos) {
     const firstClickIdx = firstClickPos.i * board.length + firstClickPos.j
     possiblePositions.splice(firstClickIdx, 1)
 
-    /* maybe later - mimic the originak game better by not allowing also the negs of the first click to be a mine, meaning splicing them from possiblePositions as well
+    /* maybe later - mimic the original game better by not allowing also the negs of the first click to be a mine, meaning splicing them from possiblePositions as well
     do it by creating a copy of the board, receive first position getNegPositions(), cut it and the first pos itself from the copy, then use getMatPositions and starr the loop below */
 
     for (var i = 0; i < minesNum; i++) {
@@ -201,27 +218,36 @@ function onCellClicked(elCell, i, j) {
         setMines(gBoard, gLevel.mines, { i, j })
         setMinesAroundCount(gBoard)
         renderCellsContent(gBoard)
+        hintModeOff() //enables click on hints after 1st click
     }
 
     const currCell = gBoard[i][j]
     if (currCell.isShown || currCell.isMarked) return
 
+    if (gGame.hintMode) {
+        expandShown(gBoard, i, j, true, elCell, false)
+        setTimeout(expandShown, 1000, gBoard, i, j, true, elCell, true)
+        hintModeOff()
+        return
+    }
+
     if (currCell.isMine) {
         gLevel.lives--
         updateLives()
+        updateMinesDisplay()
         if (!gLevel.lives) {
             gameOver(false)
             return
         }
         // restartBtnChange(SAD) //location doesnt fit - if the game ends with openning mine, but enough lives for victory
-        // setTimeout(() => {restartBtnChange(NORMAL)}, 1000)
+        // setTimeout(restartBtnChange, 1000, NORMAL)
     }
 
     showCell(currCell, elCell)
 
-    //("safe cell") -> expandShown
+    //("safe cell") -> expand
     if (!currCell.minesAroundCount && !currCell.isMine) {
-        expandShown(gBoard, elCell, i, j)
+        expandShown(gBoard, i, j)
     }
 
     checkGameOver()
@@ -232,7 +258,7 @@ function onCellMarked(event, elCell) {
     // Called when a cell is right-clicked 
     // console.log('right Clicked')
     event.preventDefault()
-    if (!gGame.isOn) return
+    if (!gGame.isOn || gGame.hintMode) return
 
     //take coors from elCell, update model, render cell
     const cellPos = getBoardPos(elCell)
@@ -249,7 +275,29 @@ function onCellMarked(event, elCell) {
         elCell.classList.remove("marked")
         gGame.markedCount--
     }
+    updateMinesDisplay()
+}
 
+function expandShown(board, i, j, forHint = false, elCell = null, toHide = null) {
+    var negsPositions = getNegPositions(i, j, board)
+
+    if (forHint) toggleShowElCell(elCell, toHide)
+
+    for (var i = 0; i < negsPositions.length; i++) {
+        var negRowIdx = negsPositions[i].i
+        var negColIdx = negsPositions[i].j
+        var currNeg = board[negRowIdx][negColIdx]
+        var elNeg = getEl({ i: negRowIdx, j: negColIdx })
+
+        if (!forHint) {
+            if (!currNeg.isShown && !currNeg.isMarked) {
+                showCell(currNeg, elNeg)
+                // !currNeg.isMine //not relevant to check because - it wont enter this func since it's only for safe cells
+            }
+        } else {
+            if (!currNeg.isShown) toggleShowElCell(elNeg, toHide)
+        }
+    }  
 }
 
 //updating show mode in DOM and model 
@@ -259,24 +307,12 @@ function showCell(cell, elCell) {
     elCell.querySelector("div").classList.remove("hide")
 }
 
-function expandShown(board, elCell, i, j) {
-    //check the unused param
-    var negsPositions = getNegPositions(i, j, board)
+//toggle show in model only
+function toggleShowElCell(elCell, toHide) {
+    const elCellContent = elCell.querySelector("div")
 
-    for (var i = 0; i < negsPositions.length; i++) {
-
-        var negRowIdx = negsPositions[i].i
-        var negColIdx = negsPositions[i].j
-        var currNeg = board[negRowIdx][negColIdx]
-
-        if (!currNeg.isShown &&
-            // !currNeg.isMine && //not relevant because - it wont enter this func
-            !currNeg.isMarked) {
-            showCell(currNeg, getEl({ i: negRowIdx, j: negColIdx }))
-            // showCell(currNeg, elCell)
-
-        }
-    }
+    if (toHide) elCellContent.classList.add("hide")
+    else elCellContent.classList.remove("hide")
 }
 
 /********** helpers funcs funcs **********/
@@ -344,7 +380,26 @@ function gameOver(isVictory = false) {
         revealAllMines()
     }
     elModal.classList.remove("hide")
+
     gGame.isOn = false
+    
+    const elHintsDiv = document.querySelector(".hints")
+    elHintsDiv.classList.add("disabeled")
 }
 
+/********** bonus funcs - before sorting **********/
 
+function onHint(elHint) {
+    gGame.hintMode = true
+    elHint.classList.add("used")
+
+    //disable another hint click when hintMode is on:
+    const elHintsDiv = document.querySelector(".hints")
+    elHintsDiv.classList.add("disabeled")
+}
+
+function hintModeOff() {
+    gGame.hintMode = false
+    const elHintsDiv = document.querySelector(".hints")
+    elHintsDiv.classList.remove("disabeled")
+}

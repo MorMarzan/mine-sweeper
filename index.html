@@ -11,22 +11,36 @@
 <body onload="onInit()">
 
     <h1>MINE SWEEPER</h1>
-
+    
     <div class="control-panel">
+        
+
+        <div class="restart">
+            <button onclick="onInit()">
+                <!-- <img src="../img/red-flag.png"> -->
+            </button>
+        </div>
+
+        <div class="lives">
+            <p><span>X</span> LIVES LEFT</p>
+        </div>
+
+        <div class="mines">
+            <p><span>X</span> MINES LEFT</p>
+        </div>
+        
         <div class="level-btns">
             <button onclick="onInit(4)">4</button>
             <button onclick="onInit(8)">8</button>
             <button onclick="onInit(12)">12</button>
         </div>
-        <div class="lives">
-            <p><span>X</span> LIVES LEFT</p>
+
+        <div class="hints">
+            <div onclick="onHint(this)">💡</div>
+            <div onclick="onHint(this)">💡</div>
+            <div onclick="onHint(this)">💡</div>
         </div>
-        <div class="restart">
-            <button onclick="onInit()">
-                😃
-                <!-- <img src="../img/red-flag.png"> -->
-            </button>
-        </div>
+
     </div>
 
     <table>
