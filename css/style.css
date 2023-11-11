@@ -12,6 +12,7 @@
     --clr4: #FFFFFF;
     --clr6: #e63946;
     --font-clr: black;
+    --span-clr: white;
 }
 
 body.dark {
@@ -44,11 +45,12 @@ table {
     border: solid 10px darkgray;
     border-color: var(--clr2);
     /* width: 60%; */
+    margin-bottom: 10px;
 }
 
 .board td {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     transition: 0.5s;
     /* background-color: lightskyblue; */
@@ -57,7 +59,7 @@ table {
 
 .board td.marked {
     background-image: url("../img/red-flag.png");
-    background-size: 30px 30px;
+    background-size: 25px 25px;
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -90,21 +92,20 @@ td>div {
 }
 
 span {
-    font-weight: 900;
+    /* font-weight: 900; */
 }
 
-.lives span {
+/* .lives span { */
     /* color: red; */
-    color: var(--clr6);
-}
+    /* color: var(--clr6); */
+/* } */
 
 .mines span {
-    /* color: blue; */
-    color: var(--clr1);
+    color: var(--span-clr);
 }
 
 .timer span {
-    font-weight: 100;
+    color: var(--span-clr);
 }
 
 .restart button {
@@ -187,16 +188,17 @@ button {
     justify-content: center;
     column-gap: 20px;
     padding: 15px;
-    width: 350px;
+    /* width: 350px; */
     margin: 0 auto;
     /* background-color: steelblue; */
     background-color: var(--clr3);
     border-radius: calc(2 * var(--border-radius));
+    margin-bottom: 10px;
 
 }
 
 .restart {
-    width: 100%;
+    /* width: 100%; */
     display: flex;
     justify-content: center;
 }
@@ -206,7 +208,7 @@ button {
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-bottom: 10px;
+    /* margin-bottom: 10px; */
 }
 
 h1 {
@@ -214,9 +216,10 @@ h1 {
     text-align: center;
 }
 
-.game-over h2 {
-    text-align: center;
+.game-over {
+    /* text-align: center; */
     color: var(--clr6);
+    margin: 0;
 }
 
 .hints div {
@@ -224,13 +227,15 @@ h1 {
     border-radius: var(--border-radius);
 }
 
-.big {
-    font-size: 30px;
+span.big {
+    /* font-size: 30px; */
+    color: var(--clr6);
 }
 
 p {
     font-size: 16px;
     margin: 0;
+    text-align: center;
 }
 
 span {
@@ -238,12 +243,11 @@ span {
 }
 
 .timer {
-    width: 50%;
     text-align: center;
-    background-color: lightskyblue;
+    /* background-color: lightskyblue; */
     background-color: var(--clr2);
-    margin-bottom: 10px;
     border-radius: var(--border-radius);
+    padding: 5px;
 }
 
 .user-helpers {
@@ -253,8 +257,8 @@ span {
     align-items: center;
     /* background-color: cornflowerblue; */
     background-color: var(--clr3);
-    padding: 20px;
-    width: 250px;
+    padding: 10px;
+    /* width: 250px; */
     /* width: 20%; */
     border-radius: var(--border-radius);
     gap: 15px;
@@ -262,11 +266,12 @@ span {
 
 .display-opts {
     /* width: 20%;   */
-    width: 250px;
+    /* width: 250px; */
     /* background-color: cornflowerblue; */
     background-color: var(--clr3);
     border-radius: var(--border-radius);
-    padding: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
 }
 
 .board td.safe {
@@ -302,6 +307,7 @@ span {
 .dark-mode {
     display: flex;
     justify-content: center;
+    margin: 15px 0;
 }
 
 .switch {
@@ -383,4 +389,25 @@ input:checked+.slider:before {
 .dark-mode>span {
     font-size: 25px;
     padding: 0 10px;
+}
+
+.lives div span {
+    font-size: 30px;
+    padding: 3px;
+}
+
+.lives div {
+    /* display: flex; */
+    /* flex-direction: column; */
+}
+
+.mines {
+    background-color: var(--clr2);
+    padding: 5px;
+    border-radius: var(--border-radius);
+}
+.lives {
+    display: flex;
+    gap: 5px;
+    align-items: center;
 }

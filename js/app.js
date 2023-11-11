@@ -4,6 +4,8 @@ const MINE = '💥'
 const NORMAL = '😃'
 const SAD = '🤯'
 const HAPPY = '😎'
+const LIFE = '💙'
+const NO_LIFE = '💔'
 
 var gBoard
 var gLevel
@@ -49,8 +51,8 @@ function onInit(size = 4) {
 
 function restartScreen() {
 
-    const elModal = document.querySelector(".game-over")
-    elModal.classList.add("hide")
+    const elGameOverTxt = document.querySelector(".game-over")
+    elGameOverTxt.classList.add("hide")
 
     const elHelper = document.querySelector(".user-helpers")
     elHelper.classList.add("disabeled-cursor")
@@ -110,10 +112,18 @@ function restartBtnChange(img) {
 }
 
 function updateLives() {
-    var elLivesSpan = document.querySelector(".lives span")
+    // var elLivesSpan = document.querySelector(".lives span")
+    
+    // elLivesSpan.innerText = gLevel.lives
+    // markTextToggle(elLivesSpan)
 
-    elLivesSpan.innerText = gLevel.lives
-    markTextToggle(elLivesSpan)
+    const elLives = document.querySelector(".lives div")
+    var htmlStr = ""
+    for (var i = 0; i < gLevel.lives; i++) {
+        htmlStr += `<span>${LIFE}</span>`
+    }
+    if (!gLevel.lives) htmlStr = `<span>${NO_LIFE}</span>`
+    elLives.innerHTML = htmlStr
 }
 
 function updateMinesDisplay() {
@@ -407,18 +417,17 @@ function checkGameOver() {
 }
 
 function gameOver(isVictory = false) {
-    const elModal = document.querySelector(".game-over")
-    const elModalText = elModal.querySelector("h2")
+    const elGameOverTxt = document.querySelector(".game-over")
 
     if (isVictory) {
-        elModalText.innerText = "VICTORY!"
+        elGameOverTxt.innerText = "VICTORY!"
         restartBtnChange(HAPPY)
     } else {
-        elModalText.innerText = "GAME OVER!"
+        elGameOverTxt.innerText = "GAME OVER!"
         restartBtnChange(SAD)
         revealAllMines()
     }
-    elModal.classList.remove("hide")
+    elGameOverTxt.classList.remove("hide")
 
     gGame.isOn = false
     stopTimer()

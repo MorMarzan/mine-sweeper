@@ -12,67 +12,86 @@
 
     <h1>MINE SWEEPER</h1>
 
-    <div class="control-panel">
-
-        <div class="restart">
-            <button onclick="onInit()">
-                <!-- <img src="../img/red-flag.png"> -->
-            </button>
-        </div>
-
-        <div class="lives">
-            <p><span>X</span> LIVES LEFT</p>
-        </div>
-
-        <div class="mines">
-            <p><span>X</span> MINES LEFT</p>
-        </div>
-
-        <div class="timer">
-            <p><span>0:00</span> ms</p>
-        </div>
-
-    </div>
-
     <div class="game-screen">
 
-        <div class="display-opts">
-            <div class="level-btns">
-                <p>levels:</p>
-                <button onclick="onInit(4)">4</button>
-                <button onclick="onInit(8)">8</button>
-                <button onclick="onInit(12)">12</button>
+        <div>
+            <div class="display-opts">
+                <p>-- DISPLAY OPTIONS --</p>
+
+                <div class="dark-mode">
+                    <span>🌤️</span>
+                    <label class="switch" onclick="onDarkMode()">
+                        <input type="checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                    <span>🌜</span>
+                </div>
+
+                <div class="level-btns">
+                    <p>levels:</p>
+                    <button onclick="onInit(4)">4</button>
+                    <button onclick="onInit(8)">8</button>
+                    <button onclick="onInit(12)">12</button>
+                </div>
+
             </div>
 
-            <div class="dark-mode">
-                <span>🌤️</span>
-                <label class="switch" onclick="onDarkMode()">
-                    <input type="checkbox">
-                    <span class="slider round"></span>
-                  </label>
-                  <span>🌜</span>
+            <div class="user-helpers">
+                <p>-- HELP KIT --</p>
+
+                <div class="safe-click">
+                    <button onclick="onSafeClick()">SAFE CLICK</button>
+                    <p><span>X</span> CLICKS AVIALABLE </p>
+                </div>
+
+                <div class="mega-hint">
+                    <button onclick="onMegaHint(this)">MEGA HINT</button>
+                </div>
+
+                <div class="hints">
+                    <div onclick="onHint(this)">💡</div>
+                    <div onclick="onHint(this)">💡</div>
+                    <div onclick="onHint(this)">💡</div>
+                </div>
+
             </div>
+
         </div>
 
-        <table>
-            <tbody class="board"></tbody>
-        </table>
 
-        <div class="user-helpers">
+        <div>
 
-            <div class="hints">
-                <div onclick="onHint(this)">💡</div>
-                <div onclick="onHint(this)">💡</div>
-                <div onclick="onHint(this)">💡</div>
+            <div class="control-panel">
+
+                <div class="mines">
+                    <p>
+                        -- <span>X</span> --<br>
+                        MINES LEFT
+                    </p>
+                </div>
+
+                <div class="restart">
+                    <button onclick="onInit()">
+                    </button>
+                </div>
+
+                <div class="timer">
+                    <p>
+                        -- <span>0:00</span> --<br>
+                        ms
+                    </p>
+                </div>
+
             </div>
 
-            <div class="safe-click">
-                <button onclick="onSafeClick()">SAFE CLICK</button>
-                <p><span>X</span> CLICKS AVIALABLE </p>
-            </div>
+            <table>
+                <tbody class="board"></tbody>
+            </table>
 
-            <div class="mega-hint">
-                <button onclick="onMegaHint(this)">MEGA HINT</button>
+            <div class="lives">
+                <div></div>
+                <h2 class="game-over hide">GAME OVER</h2>
+                <!-- <p><span>X</span> LIVES LEFT</p> -->
             </div>
 
         </div>
