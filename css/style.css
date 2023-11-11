@@ -356,6 +356,7 @@ input:checked+.slider:before {
     padding: 5px;
     border-radius: var(--border-radius);
 }
+
 .lives {
     display: flex;
     gap: 5px;

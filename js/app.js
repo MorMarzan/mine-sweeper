@@ -112,11 +112,6 @@ function restartBtnChange(img) {
 }
 
 function updateLives() {
-    // var elLivesSpan = document.querySelector(".lives span")
-    
-    // elLivesSpan.innerText = gLevel.lives
-    // markTextToggle(elLivesSpan)
-
     const elLives = document.querySelector(".lives div")
     var htmlStr = ""
     for (var i = 0; i < gLevel.lives; i++) {
@@ -322,7 +317,7 @@ function onCellClicked(elCell, i, j) {
     //("safe cell") -> expand
     if (!currCell.minesAroundCount && !currCell.isMine) {
         expandShown(gBoard, i, j)
-    } 
+    }
 
     checkGameOver()
 
@@ -418,9 +413,18 @@ function checkGameOver() {
 function gameOver(isVictory = false) {
     const elGameOverTxt = document.querySelector(".game-over")
 
+    gGame.isOn = false
+    stopTimer()
+
     if (isVictory) {
         elGameOverTxt.innerText = "VICTORY!"
         restartBtnChange(HAPPY)
+
+        // const elScore = document.querySelector(".timer span")
+        // const currScore = +elScore.innerText
+        // gGame.secsPassed = currScore
+        // updateBestScore()
+
     } else {
         elGameOverTxt.innerText = "GAME OVER!"
         restartBtnChange(SAD)
@@ -428,13 +432,13 @@ function gameOver(isVictory = false) {
     }
     elGameOverTxt.classList.remove("hide")
 
-    gGame.isOn = false
-    stopTimer()
+    
 
     const elHintsDiv = document.querySelector(".hints")
     elHintsDiv.classList.add("disabeled")
     const elHelper = document.querySelector(".user-helpers")
     elHelper.classList.add("disabeled-cursor")
+
 }
 
 function areMarkedsCorrect() {
@@ -619,3 +623,25 @@ function onDarkMode() {
         elBody.classList.remove("dark")
     }
 }
+
+/********** extra features - keep best score **********/
+
+// function updateBestScore() {
+//     const elScore = document.querySelector(".scores span")
+    
+//     if (typeof (Storage) !== "undefined") {
+//         console.log('storage!')
+//         if (localStorage.score4) {
+//             if (gGame.secsPassed < localStorage.score4) {
+//                 localStorage.score4 = gGame.secsPassed
+//                 elScore.innerText = localStorage.score4
+//                 console.log('good score')
+//         } else {
+//                 localStorage.score4 = gGame.secsPassed
+//                  console.log('prev score better')
+//             }
+//         }
+//     } else {
+//         elScore.innerHTML = "Sorry, your browser does not support web storage..."
+//     }
+// }

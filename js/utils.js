@@ -1,7 +1,5 @@
 'use strict'
 
-// console.log('hey from util js')
-
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
