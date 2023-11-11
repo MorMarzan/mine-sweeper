@@ -407,7 +407,6 @@ function toggleShowElCell(elCell, toHide) {
 
 /********** end of game funcs **********/
 
-//better name is check victory, but this is according to instructions
 function checkGameOver() {
     const cellsNum = gLevel.size ** 2
     if ((gGame.shownCount + gGame.markedCount === cellsNum) &&
