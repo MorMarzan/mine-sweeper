@@ -2,37 +2,57 @@
     box-sizing: border-box;
 }
 
-/* :root {
-    --border-radius: 10px;
+:root {
+    --border-radius: 5px;
+    --body-clr: #CAF0F8;
+    --diable-clr: black;
+    --clr1: #0077B6;
+    --clr2: #00B4D8;
+    --clr3: #90E0EF;
+    --clr4: #FFFFFF;
+    --clr6: #e63946;
+    --font-clr: black;
 }
 
-div {
-    border-radius: var(--border-radius);
-} */
+body.dark {
+    --body-clr: #3F3B6C;
+    --diable-clr: black;
+    --clr1: #624F82;
+    --clr2: #9F73AB;
+    --clr3: #66347F;
+    --clr4: #6E85B2;
+    --clr6: #D27685;
+    --font-clr: navajowhite;
+}
 
 body {
     font-family: monospace;
-    background-color: antiquewhite;
+    /* background-color: antiquewhite; */
+    background-color: var(--body-clr);
+    color: var(--font-clr);
+    ;
 }
 
 table,
 td {
-    /* border: 1px solid black; */
-    border-radius: 5px;
+    border-radius: var(--border-radius);
 }
 
 table {
-    margin: 0 auto;
-    margin-top: 20px;
+    /* margin: 0 auto; */
+    /* margin-top: 20px; */
     border: solid 10px darkgray;
+    border-color: var(--clr2);
+    /* width: 60%; */
 }
 
 .board td {
     width: 50px;
     height: 50px;
     padding: 0;
-
-    background-color: lightskyblue;
+    transition: 0.5s;
+    /* background-color: lightskyblue; */
+    background-color: var(--clr1);
 }
 
 .board td.marked {
@@ -46,12 +66,17 @@ table {
     cursor: pointer;
 }
 
+.board.mega-hint td:hover {
+    cursor: cell;
+}
+
 .hide {
     display: none;
 }
 
 td>div {
-    background-color: white;
+    /* background-color: white; */
+    background-color: var(--clr4);
     width: inherit;
     height: inherit;
     display: flex;
@@ -64,14 +89,22 @@ td>div {
     margin-bottom: 20px;
 }
 
-.lives span {
+span {
     font-weight: 900;
-    color: red;
+}
+
+.lives span {
+    /* color: red; */
+    color: var(--clr6);
 }
 
 .mines span {
-    font-weight: 900;
-    color: blue;
+    /* color: blue; */
+    color: var(--clr1);
+}
+
+.timer span {
+    font-weight: 100;
 }
 
 .restart button {
@@ -97,13 +130,28 @@ td>div {
     cursor: pointer;
 }
 
-.hints div.used {
-    background-color: black;
+/* .hints div.used { */
+.used {
+    background-color: var(--diable-clr);
     pointer-events: none
 }
 
-.hints.disabeled {
-    pointer-events: none
+body button.used {
+    background-color: var(--diable-clr);
+    color: var(--clr1);
+    font-weight: 100;
+}
+
+.disabeled {
+    pointer-events: none;
+}
+
+.disabeled-cursor {
+    cursor: not-allowed;
+}
+
+.disabeled-cursor button {
+    cursor: inherit;
 }
 
 footer {
@@ -114,18 +162,22 @@ footer {
 button {
     cursor: pointer;
     font-family: monospace;
+    font-size: 16px;
+    color: var(--font-clr);
 }
 
 .level-btns button {
     height: 30px;
     width: 30px;
-    background-color: darkgray;
+    /* background-color: darkgray; */
+    background-color: var(--clr1);
     border: unset;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
 }
 
 .level-btns button:hover {
-    background-color: wheat;
+    /* background-color: wheat; */
+    background-color: var(--clr2);
 }
 
 .control-panel {
@@ -137,8 +189,10 @@ button {
     padding: 15px;
     width: 350px;
     margin: 0 auto;
-    background-color: steelblue;
-    border-radius: 10px;
+    /* background-color: steelblue; */
+    background-color: var(--clr3);
+    border-radius: calc(2 * var(--border-radius));
+
 }
 
 .restart {
@@ -162,12 +216,12 @@ h1 {
 
 .game-over h2 {
     text-align: center;
-    color: red;
+    color: var(--clr6);
 }
 
 .hints div {
     font-size: 30px;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
 }
 
 .big {
@@ -176,7 +230,7 @@ h1 {
 
 p {
     font-size: 16px;
-    margin: 10px 0px;
+    margin: 0;
 }
 
 span {
@@ -187,6 +241,146 @@ span {
     width: 50%;
     text-align: center;
     background-color: lightskyblue;
+    background-color: var(--clr2);
     margin-bottom: 10px;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
+}
+
+.user-helpers {
+    display: flex;
+    /* margin-top: 20px; */
+    flex-direction: column;
+    align-items: center;
+    /* background-color: cornflowerblue; */
+    background-color: var(--clr3);
+    padding: 20px;
+    width: 250px;
+    /* width: 20%; */
+    border-radius: var(--border-radius);
+    gap: 15px;
+}
+
+.display-opts {
+    /* width: 20%;   */
+    width: 250px;
+    /* background-color: cornflowerblue; */
+    background-color: var(--clr3);
+    border-radius: var(--border-radius);
+    padding: 10px;
+}
+
+.board td.safe {
+    /* background-color: pink; */
+    background-color: var(--clr6);
+}
+
+.game-screen {
+    margin: 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 20px;
+    gap: 30px;
+}
+
+.safe-click {
+    display: flex;
+    flex-direction: column;
+}
+
+.safe-click p {
+    font-size: 10px;
+    margin: 5px 0 0;
+    text-align: center;
+}
+
+.level-btns p {
+    margin: auto 0;
+}
+
+/* switch styiling */
+.dark-mode {
+    display: flex;
+    justify-content: center;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* background-color: #ccc; */
+    background-color: var(--clr2);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    /* background-color: white; */
+    background-color: var(--body-clr);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    /* background-color: #2196F3; */
+    background-color: var(--diable-clr);
+}
+
+input:focus+.slider {
+    /* box-shadow: 0 0 1px #2196F3; */
+    box-shadow: 0 0 1px var(--body-clr);
+    /* box-shadow:var(--body-clr); */
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.user-helpers button {
+    background-color: var(--clr1);
+    border: none;
+    padding: 5px 15px;
+    border-radius: var(--border-radius);
+    font-weight: 900;
+}
+
+.user-helpers button:hover {
+    background-color: var(--clr2);
+}
+
+.dark-mode>span {
+    font-size: 25px;
+    padding: 0 10px;
 }

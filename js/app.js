@@ -8,6 +8,7 @@ const HAPPY = '😎'
 var gBoard
 var gLevel
 var gGame
+var gMegaHint
 
 var gStartTime
 var gInterval
@@ -23,10 +24,18 @@ function onInit(size = 4) {
     gGame = {
         isOn: true,
         firstClick: false,
+        hintMode: false,
         shownCount: 0,
         markedCount: 0,
         secsPassed: 0,
-        shownMines: 0
+        shownMines: 0,
+        safeClicks: 3,
+    }
+    gMegaHint = {
+        isOn: false,
+        clickCount: 0,
+        firstCoors: { i: -1, j: -1 },
+        secCoors: { i: -1, j: -1 }
     }
 
     gBoard = buildBoard(gLevel.size, gLevel.mines)
@@ -39,15 +48,31 @@ function onInit(size = 4) {
 }
 
 function restartScreen() {
+
     const elModal = document.querySelector(".game-over")
     elModal.classList.add("hide")
 
-    const elHintsDiv = document.querySelector(".hints")
+    const elHelper = document.querySelector(".user-helpers")
+    elHelper.classList.add("disabeled-cursor")
+
+    const elHintsDiv = elHelper.querySelector(".hints")
     elHintsDiv.classList.add("disabeled")
     const elHints = elHintsDiv.querySelectorAll("div")
     for (var i = 0; i < elHints.length; i++) {
         elHints[i].classList.remove("used")
     }
+
+    const elMegaHint = elHelper.querySelector(".mega-hint button")
+    elMegaHint.classList.remove("used")
+
+    const elSafeClick = elHelper.querySelector(".safe-click")
+    const elSafeClickSpan = elSafeClick.querySelector("span")
+    elSafeClickSpan.innerText = gGame.safeClicks
+    const elSafeClickBtn = elSafeClick.querySelector("button")
+    elSafeClickBtn.classList.remove("used")
+
+    const elBoard = document.querySelector(".board")
+    elBoard.classList.remove("mega-hint")
 
     clearInterval(gInterval)
     document.querySelector('.timer span').innerText = "0.000"
@@ -236,10 +261,10 @@ function onCellClicked(elCell, i, j) {
         setMinesAroundCount(gBoard)
         renderCellsContent(gBoard)
         hintModeOff() //enables click on hints after 1st click
-    }
 
-    const currCell = gBoard[i][j]
-    if (currCell.isShown || currCell.isMarked) return
+        const elHelper = document.querySelector(".user-helpers")
+        elHelper.classList.remove("disabeled-cursor")
+    }
 
     if (gGame.hintMode) {
         expandShown(gBoard, i, j, true, elCell, false)
@@ -247,6 +272,28 @@ function onCellClicked(elCell, i, j) {
         hintModeOff()
         return
     }
+
+    if (gMegaHint.isOn) {
+        if (gMegaHint.clickCount === 0) {
+            gMegaHint.firstCoors.i = i
+            gMegaHint.firstCoors.j = j
+            // console.log('firstCoors', gMegaHint.firstCoors)
+            gMegaHint.clickCount++
+
+        } else {
+            gMegaHint.secCoors.i = i
+            gMegaHint.secCoors.j = j
+            // console.log('secCoors', gMegaHint.secCoors)
+            megaHintHandler()
+            gMegaHint.isOn = false
+            const elBoard = document.querySelector(".board")
+            elBoard.classList.remove("mega-hint")
+        }
+        return
+    }
+
+    const currCell = gBoard[i][j]
+    if (currCell.isShown || currCell.isMarked) return
 
     if (currCell.isMine) {
         gLevel.lives--
@@ -265,7 +312,7 @@ function onCellClicked(elCell, i, j) {
     //("safe cell") -> expand
     if (!currCell.minesAroundCount && !currCell.isMine) {
         expandShown(gBoard, i, j)
-    }
+    } 
 
     checkGameOver()
 
@@ -275,7 +322,7 @@ function onCellMarked(event, elCell) {
     // Called when a cell is right-clicked 
     // console.log('right Clicked')
     event.preventDefault()
-    if (!gGame.isOn || gGame.hintMode) return
+    if (!gGame.isOn || gGame.hintMode || gMegaHint.isOn) return
 
     //take coors from elCell, update model, render cell
     const cellPos = getBoardPos(elCell)
@@ -298,7 +345,7 @@ function onCellMarked(event, elCell) {
 function expandShown(board, i, j, forHint = false, elCell = null, toHide = null) {
     var negsPositions = getNegPositions(i, j, board)
 
-    if (forHint) toggleShowElCell(elCell, toHide)
+    if (forHint && !board[i][j].isShown) toggleShowElCell(elCell, toHide)
 
     for (var i = 0; i < negsPositions.length; i++) {
         var negRowIdx = negsPositions[i].i
@@ -308,28 +355,14 @@ function expandShown(board, i, j, forHint = false, elCell = null, toHide = null)
 
         if (!forHint) {
             if (!currNeg.isShown && !currNeg.isMarked) {
-                showCell(currNeg, elNeg)
-                // !currNeg.isMine //not relevant to check because - it wont enter this func since it's only for safe cells
+                if (currNeg.minesAroundCount === 0) {
+                    onCellClicked(elNeg, negRowIdx, negColIdx)
+                } else showCell(currNeg, elNeg)
             }
         } else {
             if (!currNeg.isShown) toggleShowElCell(elNeg, toHide)
         }
     }
-}
-
-//updating show mode in DOM and model 
-function showCell(cell, elCell) {
-    cell.isShown = true
-    gGame.shownCount++
-    elCell.querySelector("div").classList.remove("hide")
-}
-
-//toggle show in model only
-function toggleShowElCell(elCell, toHide) {
-    const elCellContent = elCell.querySelector("div")
-
-    if (toHide) elCellContent.classList.add("hide")
-    else elCellContent.classList.remove("hide")
 }
 
 /********** helpers funcs funcs **********/
@@ -345,6 +378,21 @@ function getBoardPos(elCell) {
     const rowIdx = elCell.dataset.i
     const colIdx = elCell.dataset.j
     return { i: rowIdx, j: colIdx }
+}
+
+//updating show mode in DOM and model 
+function showCell(cell, elCell) {
+    cell.isShown = true
+    gGame.shownCount++
+    elCell.querySelector("div").classList.remove("hide")
+}
+
+//toggle show in model only
+function toggleShowElCell(elCell, toHide) {
+    const elCellContent = elCell.querySelector("div")
+
+    if (toHide) elCellContent.classList.add("hide")
+    else elCellContent.classList.remove("hide")
 }
 
 /********** end of game funcs **********/
@@ -377,6 +425,8 @@ function gameOver(isVictory = false) {
 
     const elHintsDiv = document.querySelector(".hints")
     elHintsDiv.classList.add("disabeled")
+    const elHelper = document.querySelector(".user-helpers")
+    elHelper.classList.add("disabeled-cursor")
 }
 
 function areMarkedsCorrect() {
@@ -405,9 +455,14 @@ function revealAllMines() {
     }
 }
 
-/********** extara features - hints funcs **********/
+/********** extra features - hints funcs **********/
 
 function onHint(elHint) {
+    if (!gGame.isOn || !gGame.firstClick || gMegaHint.isOn) {
+        console.log('hints not available ')
+        return
+    }
+
     gGame.hintMode = true
     elHint.classList.add("used")
 
@@ -420,6 +475,111 @@ function hintModeOff() {
     gGame.hintMode = false
     const elHintsDiv = document.querySelector(".hints")
     elHintsDiv.classList.remove("disabeled")
+}
+
+function onMegaHint(elMegaHint) {
+
+    if (!gGame.isOn || !gGame.firstClick || gGame.hintMode) {
+        console.log('mega hint not available ')
+        return
+    }
+    console.log('mega hint!')
+    gMegaHint.isOn = true
+    elMegaHint.classList.add("used")
+
+    const elBoard = document.querySelector(".board")
+    elBoard.classList.add("mega-hint")
+
+}
+
+function megaHintHandler() {
+
+    const firstRoxIdx = gMegaHint.firstCoors.i
+    const firstColIdx = gMegaHint.firstCoors.j
+
+    const secRoxIdx = gMegaHint.secCoors.i
+    const secColIdx = gMegaHint.secCoors.j
+
+    const rowIdxStart = (firstRoxIdx > secRoxIdx) ? secRoxIdx : firstRoxIdx
+    const rowIdxEnd = (firstRoxIdx > secRoxIdx) ? firstRoxIdx : secRoxIdx
+    const colIdxStart = (firstColIdx > secColIdx) ? secColIdx : firstColIdx
+    const colIdxEnd = (firstColIdx > secColIdx) ? firstColIdx : secColIdx
+
+    const areaIdxs = []
+    for (var i = rowIdxStart; i <= rowIdxEnd; i++) {
+        for (var j = colIdxStart; j <= colIdxEnd; j++) {
+            areaIdxs.push({ i, j })
+        }
+    }
+    // console.log('areaIdxs',areaIdxs)
+    if (!areaIdxs.length) return
+
+    for (var i = 0; i < areaIdxs.length; i++) {
+        var currCell = gBoard[areaIdxs[i].i][areaIdxs[i].j]
+        var curElCell = getEl({ i: areaIdxs[i].i, j: areaIdxs[i].j })
+        if (!currCell.isShown) {
+            toggleShowElCell(curElCell, false)
+            setTimeout(toggleShowElCell, 1000, curElCell, true)
+        }
+    }
+}
+
+/********** extra features - safe click funcs **********/
+
+function onSafeClick() {
+
+    if (gGame.safeClicks === 0 || !gGame.isOn || !gGame.firstClick) {
+        console.log('safes are not available ')
+        return
+    }
+
+    // console.log('safe!')
+    gGame.safeClicks--
+
+    const elSafeClick = document.querySelector(".safe-click")
+    const elSafeClickSpan = elSafeClick.querySelector("span")
+    elSafeClickSpan.innerText = gGame.safeClicks
+
+    if (gGame.safeClicks === 0) {
+        var elSafeClickBtn = elSafeClick.querySelector("button")
+        elSafeClickBtn.classList.add("used")
+    }
+
+    //find in model a cell that is not mine, not shown:
+    const safeCells = getSafeCell(gBoard)
+    if (!safeCells) {
+        console.log('no safe cells on the board')
+        return
+    }
+    const randIdx = getRandomInt(0, safeCells.length)
+    const randSafeCell = safeCells[randIdx]
+    const rowIdx = randSafeCell.i
+    const colIdx = randSafeCell.j
+
+    //find the matching el in dom, make it cjange its look
+    const elSafeCell = getEl({ i: rowIdx, j: colIdx })
+    elSafeCell.classList.add("safe")
+
+    setTimeout(() => {
+        elSafeCell.classList.remove("safe")
+    },
+        1000, elSafeCell)
+
+}
+
+function getSafeCell(board) {
+    const safeCoors = []
+
+    for (var i = 0; i < board.length; i++) {
+        for (var j = 0; j < board[i].length; j++) {
+            var currCell = board[i][j]
+            if (!currCell.isMine && !currCell.isShown) {
+                safeCoors.push({ i, j })
+            }
+        }
+    }
+    if (safeCoors.length === 0) return null
+    return safeCoors
 }
 
 /********** timer funcs **********/
@@ -438,4 +598,16 @@ function updateTimer() {
 
 function stopTimer() {
     clearInterval(gInterval)
+}
+
+/********** extra features - dark mode **********/
+
+function onDarkMode() {
+    const elCheckbox = document.querySelector("input")
+    const elBody = document.querySelector("body")
+    if (elCheckbox.checked) {
+        elBody.classList.add("dark")
+    } else {
+        elBody.classList.remove("dark")
+    }
 }
